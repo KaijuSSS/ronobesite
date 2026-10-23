@@ -102,7 +102,7 @@ function ProfileForm({ userId }: { userId: string }) {
 
   return (
     <Section icon={UserCog} title="Профиль">
-      <div className="mb-6 flex items-center gap-4">
+      <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
         <UserAvatar profile={profile} className="size-20 text-lg" />
         <div className="flex flex-wrap gap-2">
           <input

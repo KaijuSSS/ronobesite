@@ -39,9 +39,10 @@ export default function AdminPage() {
   useDocumentTitle('Администрирование')
   return (
     <PageContainer className="space-y-6">
-      <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">Администрирование</h1>
+      {/* Длинное слово: на самых узких экранах заголовок чуть меньше, чтобы не вылезал. */}
+      <h1 className="font-display text-xl font-bold tracking-tight min-[360px]:text-2xl sm:text-3xl">Администрирование</h1>
       <Tabs defaultValue="invites" className="gap-6">
-        <TabsList>
+        <TabsList className="w-full sm:w-fit max-sm:[&_svg]:hidden">
           <TabsTrigger value="invites">
             <Ticket /> Приглашения
           </TabsTrigger>
@@ -49,7 +50,7 @@ export default function AdminPage() {
             <Users /> Участники
           </TabsTrigger>
           <TabsTrigger value="settings">
-            <Settings2 /> Доступ к сайту
+            <Settings2 /> Доступ
           </TabsTrigger>
         </TabsList>
         <TabsContent value="invites">

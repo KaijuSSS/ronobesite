@@ -81,7 +81,7 @@ export default function CatalogPage() {
             {books.data ? `Найдено: ${formatCount(books.data.total, ['произведение', 'произведения', 'произведений'])}` : ' '}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="secondary" className="lg:hidden">
@@ -100,7 +100,7 @@ export default function CatalogPage() {
             </SheetContent>
           </Sheet>
           <Select value={params.sort} onValueChange={(value) => update({ sort: value as BookSort })}>
-            <SelectTrigger className="w-[200px]" aria-label="Сортировка">
+            <SelectTrigger className="min-w-0 flex-1 sm:w-[200px] sm:flex-none" aria-label="Сортировка">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

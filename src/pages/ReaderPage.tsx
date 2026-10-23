@@ -155,6 +155,9 @@ function ReaderView() {
     settings.theme === 'dark' ? 'bg-[#101115]/85' : 'bg-[color:var(--card)]/90',
   )
 
+  // На узких экранах подписи переносятся, а не вылезают за кнопку.
+  const chapterNavClass = 'h-auto gap-1.5 px-3 py-3 whitespace-normal has-[>svg]:px-2.5 sm:gap-2 sm:px-5'
+
   const content = (() => {
     if (book.error || chapter.error) {
       return <ErrorState error={book.error ?? chapter.error} onRetry={() => void chapter.refetch()} />
@@ -202,9 +205,9 @@ function ReaderView() {
           <RichText content={chapter.data.revision?.content} className="reader-prose" />
         </article>
 
-        <nav aria-label="Переход между главами" className="mt-14 grid grid-cols-2 gap-3">
+        <nav aria-label="Переход между главами" className="mt-14 grid grid-cols-2 gap-3 font-sans">
           {prev ? (
-            <Button asChild variant="secondary" size="lg" className="h-auto justify-start py-3">
+            <Button asChild variant="secondary" size="lg" className={cn(chapterNavClass, 'justify-start')}>
               <Link to={`/book/${slug}/chapter/${prev.id}`}>
                 <ChevronLeft />
                 <span className="min-w-0 text-left">
@@ -217,7 +220,7 @@ function ReaderView() {
             <span />
           )}
           {next ? (
-            <Button asChild size="lg" className="bg-brand-gradient h-auto justify-end border-0 py-3 text-white">
+            <Button asChild size="lg" className={cn(chapterNavClass, 'bg-brand-gradient justify-end border-0 text-white')}>
               <Link to={`/book/${slug}/chapter/${next.id}`}>
                 <span className="min-w-0 text-right">
                   <span className="block text-xs opacity-80">Следующая</span>
@@ -227,8 +230,13 @@ function ReaderView() {
               </Link>
             </Button>
           ) : (
-            <Button asChild variant="secondary" size="lg" className="h-auto py-3">
-              <Link to={`/book/${slug}`}>Это последняя глава — к произведению</Link>
+            <Button asChild variant="secondary" size="lg" className={cn(chapterNavClass, 'justify-end')}>
+              <Link to={`/book/${slug}`}>
+                <span className="min-w-0 text-right">
+                  <span className="block text-xs opacity-70">Последняя глава</span>
+                  <span className="block">К произведению</span>
+                </span>
+              </Link>
             </Button>
           )}
         </nav>
@@ -241,7 +249,7 @@ function ReaderView() {
   })()
 
   return (
-    <div style={themeStyle} className="min-h-dvh transition-colors duration-300">
+    <div style={themeStyle} className="min-h-dvh overflow-x-clip transition-colors duration-300">
       <header
         className={cn(barClass, 'top-0 border-b', !uiVisible && '-translate-y-full')}
         aria-hidden={!uiVisible ? true : undefined}
