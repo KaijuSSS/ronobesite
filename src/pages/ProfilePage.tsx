@@ -10,6 +10,7 @@ import { PageContainer } from '@/components/layout/AppLayout'
 import { UserAvatar } from '@/components/layout/UserAvatar'
 import { useAuth } from '@/features/auth/hooks'
 import { useBooksByAuthor } from '@/features/books/hooks'
+import { UserAdminControls } from '@/features/admin/UserAdminControls'
 import { fetchProfileByUsername } from '@/features/profile/api'
 import { FollowButton, FollowersCount } from '@/features/profile/FollowButton'
 import { LibraryOverview } from '@/pages/LibraryPage'
@@ -108,6 +109,8 @@ export default function ProfilePage() {
           )}
         </div>
       </section>
+
+      <UserAdminControls userId={p.id} name={displayName(p)} roles={p.roles} />
 
       <section aria-labelledby="works-heading" className="space-y-4">
         <h2 id="works-heading" className="flex items-center gap-2 text-lg font-semibold">

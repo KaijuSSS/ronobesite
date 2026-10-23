@@ -26,6 +26,7 @@ const StudioBookPage = lazy(() => import('@/pages/studio/StudioBookPage'))
 const ChapterEditorPage = lazy(() => import('@/pages/studio/ChapterEditorPage'))
 const ModerationPage = lazy(() => import('@/pages/moderation/ModerationPage'))
 const ModerationItemPage = lazy(() => import('@/pages/moderation/ModerationItemPage'))
+const StaffChapterEditPage = lazy(() => import('@/pages/moderation/StaffChapterEditPage'))
 const AdminPage = lazy(() => import('@/pages/admin/AdminPage'))
 
 type Guard = (props: { children: ReactNode }) => ReactNode
@@ -69,6 +70,7 @@ export const routes: RouteObject[] = [
       { path: 'studio/books/:bookId/chapters/:chapterId', element: guarded(writer, ChapterEditorPage) },
       { path: 'moderation', element: guarded(staff, ModerationPage) },
       { path: 'moderation/:queueId', element: guarded(staff, ModerationItemPage) },
+      { path: 'moderation/edit/:slug/:chapterId', element: guarded(staff, StaffChapterEditPage) },
       { path: 'admin', element: guarded(admin, AdminPage) },
       { path: '*', element: <NotFoundPage /> },
     ],

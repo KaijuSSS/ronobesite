@@ -223,6 +223,15 @@ export type AppSettingsRow = {
   updated_at: string
 }
 
+export type UserBanRow = {
+  user_id: string
+  reason: string
+  banned_by: string | null
+  created_at: string
+}
+
+export type MyBan = { reason: string; banned_at: string }
+
 export type ChapterLikeInfo = { count: number; liked: boolean }
 export type FollowInfo = { followers: number; following: boolean }
 export type ChapterStatsRow = { chapter_id: string; likes: number; reads: number }
@@ -393,6 +402,7 @@ export type Database = {
         Partial<InviteRow>,
         [Rel<'invites_created_by_fkey', 'created_by', 'profiles'>]
       >
+      user_bans: Table<UserBanRow, never, never, [Rel<'user_bans_user_id_fkey', 'user_id', 'profiles'>]>
       invite_uses: Table<
         InviteUseRow,
         Pick<InviteUseRow, 'invite_id' | 'user_id'>,
@@ -457,6 +467,13 @@ export type Database = {
       book_chapter_stats: { Args: { _book_id: string }; Returns: ChapterStatsRow[] }
       follow_info: { Args: { _author_id: string }; Returns: Json }
       toggle_follow: { Args: { _author_id: string }; Returns: Json }
+      my_ban: { Args: NoFunctionArgs; Returns: Json }
+      set_user_ban: { Args: { _user_id: string; _banned: boolean; _reason?: string | null }; Returns: undefined }
+      staff_edit_chapter: {
+        Args: { _chapter_id: string; _title: string; _content: Json; _note?: string | null }
+        Returns: undefined
+      }
+      staff_delete_chapter: { Args: { _chapter_id: string; _reason: string }; Returns: undefined }
     }
     Enums: {
       app_role: AppRole

@@ -1,7 +1,7 @@
 import { getSupabase } from '@/lib/supabase'
 import { AppError, unwrap } from '@/lib/errors'
 import { env } from '@/lib/env'
-import type { AppRole, ProfileRow } from '@/types/database'
+import type { AppRole, MyBan, ProfileRow } from '@/types/database'
 
 export type PublicConfig = {
   registration_mode: 'invite' | 'open'
@@ -135,16 +135,21 @@ export async function resendConfirmation(email: string): Promise<void> {
 export type CurrentUser = {
   profile: ProfileRow | null
   roles: AppRole[]
+  /** Блокировка аккаунта; null — не заблокирован. */
+  ban: MyBan | null
 }
 
 export async function fetchCurrentUser(userId: string): Promise<CurrentUser> {
   const supabase = getSupabase()
-  const [profile, roles] = await Promise.all([
+  const [profile, roles, ban] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
     supabase.from('user_roles').select('role').eq('user_id', userId),
+    supabase.rpc('my_ban'),
   ])
+  if (ban.error) console.warn('Не удалось проверить блокировку аккаунта', ban.error)
   return {
     profile: unwrap(profile),
     roles: (unwrap(roles) ?? []).map((r) => r.role),
+    ban: ban.error ? null : ((ban.data as MyBan | null) ?? null),
   }
 }

@@ -17,8 +17,11 @@ function useLoginRedirect() {
 /** Доступ к каталогу и чтению: участник сайта или открытый каталог. */
 export function RequireMember({ children }: { children: ReactNode }) {
   const access = useCatalogAccess()
+  const { ban } = useAuth()
   const loginUrl = useLoginRedirect()
   if (access.isLoading) return <PageLoader />
+  // Заблокированного — на главную, где показан экран блокировки (не на вход: вход вернул бы его сюда).
+  if (ban) return <Navigate to="/" replace />
   if (!access.canRead) return <Navigate to={loginUrl} replace />
   return <>{children}</>
 }

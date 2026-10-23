@@ -33,6 +33,7 @@ export function useAuth() {
   })
 
   const roles = me.data?.roles ?? []
+  const ban = me.data?.ban ?? null
   return {
     session,
     user: session?.user ?? null,
@@ -43,7 +44,9 @@ export function useAuth() {
     isAdmin: roles.includes('admin'),
     isStaff: roles.includes('admin') || roles.includes('moderator'),
     /** Может создавать произведения и главы (роли «Автор», модератор, администратор). */
-    canWrite: WRITER_ROLES.some((role) => roles.includes(role)),
+    canWrite: !ban && WRITER_ROLES.some((role) => roles.includes(role)),
+    /** Блокировка аккаунта администратором (причина и дата) или null. */
+    ban,
     /** Пока true — неизвестно, вошёл ли пользователь и какие у него роли. */
     isLoading: initializing || (Boolean(userId) && me.isPending),
     error: me.error,
@@ -56,7 +59,7 @@ export function useCatalogAccess() {
   const config = usePublicConfig()
   const isPublic = config.data?.catalog_access === 'public'
   return {
-    canRead: auth.isAuthenticated || isPublic,
+    canRead: !auth.ban && (auth.isAuthenticated || isPublic),
     isLoading: auth.isLoading || (!auth.isAuthenticated && config.isPending),
     config: config.data,
   }

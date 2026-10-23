@@ -14,6 +14,7 @@ import { useBook } from '@/features/books/hooks'
 import { markChapterRead } from '@/features/chapters/api'
 import { ChapterLikeButton } from '@/features/chapters/ChapterLikeButton'
 import { useChapterForReading, usePublishedChapters } from '@/features/chapters/hooks'
+import { ChapterStaffActions } from '@/features/moderation/ChapterStaffActions'
 import { useBookProgress } from '@/features/library/hooks'
 import { getLocalProgress } from '@/features/reader/local-progress'
 import { measurePosition, scrollToPosition } from '@/features/reader/position'
@@ -217,8 +218,9 @@ function ReaderView() {
           <RichText content={chapter.data.revision?.content} className="reader-prose" />
         </article>
 
-        <div className="mt-14">
+        <div className="mt-14 space-y-6">
           <ChapterLikeButton chapterId={chapter.data.id} />
+          <ChapterStaffActions bookSlug={book.data.slug} chapterId={chapter.data.id} />
         </div>
 
         <nav aria-label="Переход между главами" className="mt-10 grid grid-cols-2 gap-3 font-sans">

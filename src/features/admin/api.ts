@@ -1,6 +1,6 @@
 import { getSupabase } from '@/lib/supabase'
 import { unwrap, unwrapList, unwrapOne } from '@/lib/errors'
-import type { AdminUserRow, AppRole, AppSettingsRow, InviteRow } from '@/types/database'
+import type { AdminUserRow, AppRole, AppSettingsRow, InviteRow, UserBanRow } from '@/types/database'
 
 export async function fetchInvites(): Promise<InviteRow[]> {
   return unwrapList(await getSupabase().from('invites').select('*').order('created_at', { ascending: false }).limit(200))
@@ -36,6 +36,16 @@ export async function fetchUsers(): Promise<AdminUserRow[]> {
 
 export async function setUserRole(userId: string, role: AppRole, enabled: boolean): Promise<void> {
   unwrap(await getSupabase().rpc('set_user_role', { _user_id: userId, _role: role, _enabled: enabled }))
+}
+
+/** Блокировки участников (видны только администратору). */
+export async function fetchBans(): Promise<Map<string, UserBanRow>> {
+  const rows = unwrapList(await getSupabase().from('user_bans').select('*'))
+  return new Map(rows.map((row) => [row.user_id, row]))
+}
+
+export async function setUserBan(userId: string, banned: boolean, reason?: string): Promise<void> {
+  unwrap(await getSupabase().rpc('set_user_ban', { _user_id: userId, _banned: banned, _reason: reason ?? null }))
 }
 
 export async function updateSettings(

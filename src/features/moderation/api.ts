@@ -7,6 +7,7 @@ import type {
   ChapterRevisionRow,
   ChapterRow,
   GenreRow,
+  Json,
   ModerationEventRow,
   ModerationKind,
   ModerationQueueRow,
@@ -147,6 +148,22 @@ export async function approveSubmission(queueId: string, note: string): Promise<
 
 export async function rejectSubmission(queueId: string, reason: string): Promise<void> {
   unwrap(await getSupabase().rpc('reject_submission', { _queue_id: queueId, _reason: reason }))
+}
+
+/** Модератор исправляет опубликованную главу: новая версия публикуется сразу. */
+export async function staffEditChapter(chapterId: string, title: string, content: Json, note: string): Promise<void> {
+  unwrap(
+    await getSupabase().rpc('staff_edit_chapter', {
+      _chapter_id: chapterId,
+      _title: title.trim(),
+      _content: content,
+      _note: note.trim() || null,
+    }),
+  )
+}
+
+export async function staffDeleteChapter(chapterId: string, reason: string): Promise<void> {
+  unwrap(await getSupabase().rpc('staff_delete_chapter', { _chapter_id: chapterId, _reason: reason }))
 }
 
 export type HistoryEvent = ModerationEventRow & {

@@ -22,10 +22,11 @@ import {
   fetchUsers,
   inviteState,
   revokeInvite,
-  setUserRole,
   updateSettings,
   type InviteState,
 } from '@/features/admin/api'
+import { adminKeys, MANAGED_ROLES, useUserAdminActions } from '@/features/admin/hooks'
+import { BanButton, BanNotice } from '@/features/admin/UserAdminControls'
 import { authKeys, useAuth, usePublicConfig } from '@/features/auth/hooks'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { appUrl } from '@/lib/app-url'
@@ -294,17 +295,8 @@ function InvitesTab() {
 
 function UsersTab() {
   const { userId } = useAuth()
-  const queryClient = useQueryClient()
-  const users = useQuery({ queryKey: ['admin', 'users'], queryFn: fetchUsers })
-  const toggle = useMutation({
-    mutationFn: ({ id, role, enabled }: { id: string; role: AppRole; enabled: boolean }) => setUserRole(id, role, enabled),
-    onSuccess: () => {
-      toast.success('Роли обновлены')
-      void queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
-      void queryClient.invalidateQueries({ queryKey: ['me'] })
-    },
-    onError: (error) => toast.error(getErrorMessage(error)),
-  })
+  const users = useQuery({ queryKey: adminKeys.users, queryFn: fetchUsers })
+  const { setRole } = useUserAdminActions()
 
   if (users.error) return <ErrorState error={users.error} onRetry={() => void users.refetch()} />
   if (users.isPending) return <Skeleton className="h-64 rounded-2xl" />
@@ -313,10 +305,10 @@ function UsersTab() {
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
         «Автор» может создавать произведения и главы. Модераторы и администраторы могут это всегда, остальные участники
-        только читают, оценивают и комментируют.
+        только читают, оценивают и комментируют. Роли и блокировку можно менять и прямо в профиле участника.
       </p>
-      <div className="overflow-x-auto rounded-2xl border border-white/5 bg-card">
-        <table className="w-full min-w-[720px] text-sm">
+      <div className="relative overflow-x-auto rounded-2xl border border-white/5 bg-card">
+        <table className="w-full min-w-[860px] text-sm">
           <caption className="sr-only">Участники сайта</caption>
           <thead>
             <tr className="border-b border-white/5 text-left text-xs text-muted-foreground">
@@ -335,6 +327,9 @@ function UsersTab() {
               <th scope="col" className="px-4 py-3 font-medium">
                 Администратор
               </th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                <span className="sr-only">Блокировка</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -345,25 +340,29 @@ function UsersTab() {
                     {displayName(user)}
                   </Link>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
+                  <BanNotice userId={user.id} />
                 </td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">
                   {formatDate(user.created_at)}
                   {user.last_sign_in_at ? <span className="block">вход {formatRelative(user.last_sign_in_at)}</span> : null}
                 </td>
-                {(['author', 'moderator', 'admin'] as const).map((role) => {
+                {MANAGED_ROLES.map((role) => {
                   const has = user.roles.includes(role)
                   const self = user.id === userId && role === 'admin'
                   return (
                     <td key={role} className="px-4 py-3">
                       <Switch
                         checked={has}
-                        disabled={toggle.isPending || self}
+                        disabled={setRole.isPending || self}
                         aria-label={`${ROLE_LABELS[role]}: ${displayName(user)}`}
-                        onCheckedChange={(enabled) => toggle.mutate({ id: user.id, role, enabled })}
+                        onCheckedChange={(enabled) => setRole.mutate({ userId: user.id, role, enabled })}
                       />
                     </td>
                   )
                 })}
+                <td className="px-4 py-3 text-right">
+                  <BanButton userId={user.id} name={displayName(user)} isAdminUser={user.roles.includes('admin')} />
+                </td>
               </tr>
             ))}
           </tbody>

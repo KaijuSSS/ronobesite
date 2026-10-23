@@ -1,6 +1,8 @@
 import { Suspense, useEffect } from 'react'
 import { Outlet, ScrollRestoration, useNavigate } from 'react-router'
 import { PageLoader } from '@/components/common/PageLoader'
+import { BannedScreen } from '@/features/auth/BannedScreen'
+import { useAuth } from '@/features/auth/hooks'
 import { useAuthStore } from '@/features/auth/store'
 import { Footer } from './Footer'
 import { Header } from './Header'
@@ -17,6 +19,7 @@ export function PasswordRecoveryRedirect() {
 }
 
 export function AppLayout() {
+  const { ban } = useAuth()
   return (
     <div className="flex min-h-dvh flex-col">
       <a
@@ -27,9 +30,13 @@ export function AppLayout() {
       </a>
       <Header />
       <main id="main" className="flex-1">
-        <Suspense fallback={<PageLoader />}>
-          <Outlet />
-        </Suspense>
+        {ban ? (
+          <BannedScreen ban={ban} />
+        ) : (
+          <Suspense fallback={<PageLoader />}>
+            <Outlet />
+          </Suspense>
+        )}
       </main>
       <Footer />
       <MobileNav />
