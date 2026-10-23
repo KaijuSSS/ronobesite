@@ -30,6 +30,16 @@ export function safeHref(value: unknown): string | null {
   }
 }
 
+const CHAPTER_IMAGE_PATH = /^chapters\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(webp|png|jpe?g)$/
+
+/**
+ * Изображения в тексте — только загруженные на сайт: путь в бакете вида
+ * chapters/<user_id>/<uuid>.webp. Внешние адреса и data: не допускаются.
+ */
+export function safeImagePath(value: unknown): string | null {
+  return typeof value === 'string' && CHAPTER_IMAGE_PATH.test(value) ? value : null
+}
+
 /** Простой текст документа (для подсчётов и превью). */
 export function plainText(content: Json | null | undefined, limit = Infinity): string {
   const parts: string[] = []

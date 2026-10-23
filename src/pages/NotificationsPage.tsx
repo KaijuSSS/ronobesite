@@ -36,7 +36,11 @@ export default function NotificationsPage() {
           ))}
         </div>
       ) : notifications.data.length === 0 ? (
-        <EmptyState icon={Bell} title="Уведомлений нет" description="Здесь появятся решения модераторов по вашим заявкам." />
+        <EmptyState
+          icon={Bell}
+          title="Уведомлений нет"
+          description="Здесь появятся решения модераторов, комментарии к вашим книгам и новые главы авторов, на которых вы подписаны."
+        />
       ) : (
         <ul className="space-y-2">
           {notifications.data.map((n) => {

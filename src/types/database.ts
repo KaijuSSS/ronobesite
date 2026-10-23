@@ -223,6 +223,10 @@ export type AppSettingsRow = {
   updated_at: string
 }
 
+export type ChapterLikeInfo = { count: number; liked: boolean }
+export type FollowInfo = { followers: number; following: boolean }
+export type ChapterStatsRow = { chapter_id: string; likes: number; reads: number }
+
 export type AdminUserRow = {
   id: string
   username: string
@@ -447,6 +451,12 @@ export type Database = {
         Args: { _registration_mode: string | null; _catalog_access: string | null }
         Returns: AppSettingsRow
       }
+      chapter_like_info: { Args: { _chapter_id: string }; Returns: Json }
+      toggle_chapter_like: { Args: { _chapter_id: string }; Returns: Json }
+      mark_chapter_read: { Args: { _chapter_id: string }; Returns: undefined }
+      book_chapter_stats: { Args: { _book_id: string }; Returns: ChapterStatsRow[] }
+      follow_info: { Args: { _author_id: string }; Returns: Json }
+      toggle_follow: { Args: { _author_id: string }; Returns: Json }
     }
     Enums: {
       app_role: AppRole

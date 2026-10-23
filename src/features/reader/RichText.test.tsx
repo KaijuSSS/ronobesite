@@ -1,8 +1,14 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { Json } from '@/types/database'
 import { RichText } from './RichText'
-import { countWords, plainText, safeHref } from './rich-text-utils'
+import { countWords, plainText, safeHref, safeImagePath } from './rich-text-utils'
+
+vi.mock('@/lib/media', () => ({
+  signMediaPath: vi.fn(async (path: string) => `https://storage.test/signed/${path}`),
+}))
+
+const IMAGE_PATH = 'chapters/0b7c1c2e-5f0a-4d36-9a3e-6d2f1f6a7b10/9d1e2f3a-4b5c-4d6e-8f70-1a2b3c4d5e6f.webp'
 
 const doc = (...content: Json[]): Json => ({ type: 'doc', content })
 const p = (...content: Json[]): Json => ({ type: 'paragraph', content })
@@ -54,6 +60,12 @@ describe('RichText', () => {
     expect(container.textContent).toContain('вложенный текст')
   })
 
+  it('показывает загруженные на сайт изображения', async () => {
+    render(<RichText content={doc({ type: 'image', attrs: { path: IMAGE_PATH, alt: 'Карта королевства' } })} />)
+    const img = await screen.findByRole('img', { name: 'Карта королевства' })
+    expect(img).toHaveAttribute('src', `https://storage.test/signed/${IMAGE_PATH}`)
+  })
+
   it('игнорирует некорректный документ', () => {
     const { container } = render(<RichText content={{ type: 'paragraph' }} />)
     expect(container).toBeEmptyDOMElement()
@@ -68,6 +80,14 @@ describe('утилиты документа', () => {
     expect(safeHref('data:text/html,<b>x</b>')).toBeNull()
     expect(safeHref('  JaVaScRiPt:alert(1)')).toBeNull()
     expect(safeHref(42)).toBeNull()
+  })
+
+  it('safeImagePath пропускает только файлы из папки глав', () => {
+    expect(safeImagePath(IMAGE_PATH)).toBe(IMAGE_PATH)
+    expect(safeImagePath('https://evil.example/x.png')).toBeNull()
+    expect(safeImagePath('avatars/0b7c1c2e-5f0a-4d36-9a3e-6d2f1f6a7b10/9d1e2f3a-4b5c-4d6e-8f70-1a2b3c4d5e6f.webp')).toBeNull()
+    expect(safeImagePath('chapters/../secret.webp')).toBeNull()
+    expect(safeImagePath(null)).toBeNull()
   })
 
   it('считает слова и извлекает текст', () => {

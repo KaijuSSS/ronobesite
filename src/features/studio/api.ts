@@ -6,6 +6,7 @@ import type {
   BookRow,
   ChapterRevisionRow,
   ChapterRow,
+  ChapterStatsRow,
   GenreRow,
   Json,
   ModerationQueueRow,
@@ -187,6 +188,12 @@ export async function fetchStudioChapters(bookId: string): Promise<StudioChapter
     ...chapter,
     openRevision: revisions.find((r) => (OPEN_STATES as readonly string[]).includes(r.state)) ?? null,
   }))
+}
+
+/** Лайки и прочтения глав (видны только автору и модераторам). */
+export async function fetchChapterStats(bookId: string): Promise<Map<string, ChapterStatsRow>> {
+  const rows = unwrapList(await getSupabase().rpc('book_chapter_stats', { _book_id: bookId }))
+  return new Map(rows.map((row) => [row.chapter_id, row]))
 }
 
 export async function createChapter(bookId: string, number: number | null, title: string): Promise<ChapterRow> {

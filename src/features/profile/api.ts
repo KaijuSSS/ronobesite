@@ -1,6 +1,6 @@
 import { getSupabase } from '@/lib/supabase'
 import { unwrap, unwrapOne } from '@/lib/errors'
-import type { AppRole, ProfileRow } from '@/types/database'
+import type { AppRole, FollowInfo, ProfileRow } from '@/types/database'
 
 export type PublicProfile = ProfileRow & { roles: AppRole[] }
 
@@ -16,4 +16,12 @@ export type ProfileUpdate = Partial<Pick<ProfileRow, 'username' | 'display_name'
 
 export async function updateProfile(userId: string, patch: ProfileUpdate): Promise<ProfileRow> {
   return unwrapOne(await getSupabase().from('profiles').update(patch).eq('id', userId).select('*').single())
+}
+
+export async function fetchFollowInfo(authorId: string): Promise<FollowInfo> {
+  return unwrapOne(await getSupabase().rpc('follow_info', { _author_id: authorId })) as FollowInfo
+}
+
+export async function toggleFollow(authorId: string): Promise<FollowInfo> {
+  return unwrapOne(await getSupabase().rpc('toggle_follow', { _author_id: authorId })) as FollowInfo
 }

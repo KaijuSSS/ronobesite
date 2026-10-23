@@ -11,6 +11,8 @@ import { ChapterList } from '@/components/reader/ChapterList'
 import { ReaderSettingsPanel } from '@/components/reader/ReaderSettingsPanel'
 import { useAuth } from '@/features/auth/hooks'
 import { useBook } from '@/features/books/hooks'
+import { markChapterRead } from '@/features/chapters/api'
+import { ChapterLikeButton } from '@/features/chapters/ChapterLikeButton'
 import { useChapterForReading, usePublishedChapters } from '@/features/chapters/hooks'
 import { useBookProgress } from '@/features/library/hooks'
 import { getLocalProgress } from '@/features/reader/local-progress'
@@ -114,6 +116,16 @@ function ReaderView() {
     }
   }, [report, settings.autoHideUi])
 
+  // Дочитанная глава попадает в статистику автора (один раз на читателя).
+  const markedRead = useRef(false)
+  useEffect(() => {
+    if (!isAuthenticated || !restored || !chapterId || markedRead.current || progress < 0.9) return
+    markedRead.current = true
+    markChapterRead(chapterId).catch(() => {
+      markedRead.current = false
+    })
+  }, [chapterId, isAuthenticated, progress, restored])
+
   // Клавиши ← и → переключают главы.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -205,7 +217,11 @@ function ReaderView() {
           <RichText content={chapter.data.revision?.content} className="reader-prose" />
         </article>
 
-        <nav aria-label="Переход между главами" className="mt-14 grid grid-cols-2 gap-3 font-sans">
+        <div className="mt-14">
+          <ChapterLikeButton chapterId={chapter.data.id} />
+        </div>
+
+        <nav aria-label="Переход между главами" className="mt-10 grid grid-cols-2 gap-3 font-sans">
           {prev ? (
             <Button asChild variant="secondary" size="lg" className={cn(chapterNavClass, 'justify-start')}>
               <Link to={`/book/${slug}/chapter/${prev.id}`}>

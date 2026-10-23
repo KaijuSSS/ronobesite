@@ -165,6 +165,29 @@
 .reader-prose blockquote p {
   text-indent: 0;
 }
+.reader-prose .chapter-image {
+  margin: 1.6em 0;
+}
+.reader-prose .chapter-image img {
+  display: block;
+  max-width: 100%;
+  max-height: 85vh;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 12px;
+}
+.reader-prose .chapter-image-placeholder {
+  display: flex;
+  min-height: 12rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 12px;
+  background: color-mix(in oklab, currentColor 6%, transparent);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
 .reader-prose hr {
   border: 0;
   height: auto;

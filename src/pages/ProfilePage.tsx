@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
-import { BookOpen, CalendarDays, PenSquare, Settings, UserX } from 'lucide-react'
+import { BookOpen, CalendarDays, PenSquare, Settings, Users, UserX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BookCard, BookGrid, BookGridSkeleton } from '@/components/books/BookCard'
@@ -11,6 +11,7 @@ import { UserAvatar } from '@/components/layout/UserAvatar'
 import { useAuth } from '@/features/auth/hooks'
 import { useBooksByAuthor } from '@/features/books/hooks'
 import { fetchProfileByUsername } from '@/features/profile/api'
+import { FollowButton, FollowersCount } from '@/features/profile/FollowButton'
 import { LibraryOverview } from '@/pages/LibraryPage'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { displayName, formatDate } from '@/lib/format'
@@ -84,8 +85,13 @@ export default function ProfilePage() {
               ))}
             </div>
             <p className="text-sm text-muted-foreground">@{p.username}</p>
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <CalendarDays className="size-3.5" aria-hidden /> На сайте с {formatDate(p.created_at)}
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <CalendarDays className="size-3.5" aria-hidden /> На сайте с {formatDate(p.created_at)}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Users className="size-3.5" aria-hidden /> <FollowersCount authorId={p.id} />
+              </span>
             </p>
             {p.bio ? <p className="max-w-2xl pt-1 text-sm whitespace-pre-line text-foreground/85">{p.bio}</p> : null}
           </div>
@@ -97,7 +103,9 @@ export default function ProfilePage() {
                 </Link>
               </Button>
             </div>
-          ) : null}
+          ) : (
+            <FollowButton authorId={p.id} className="self-start sm:self-center" />
+          )}
         </div>
       </section>
 

@@ -95,12 +95,18 @@ async function shrinkImage(file: File, maxWidth: number, maxHeight: number): Pro
   }
 }
 
-export type MediaFolder = 'covers' | 'avatars'
+export type MediaFolder = 'covers' | 'avatars' | 'chapters'
+
+const SIZE_LIMITS: Record<MediaFolder, [number, number]> = {
+  covers: [900, 1350],
+  avatars: [400, 400],
+  chapters: [1600, 2400],
+}
 
 /** Загружает изображение в папку пользователя и возвращает путь в бакете. */
 export async function uploadImage(file: File, folder: MediaFolder, userId: string): Promise<string> {
   validateImageFile(file)
-  const limits = folder === 'covers' ? [900, 1350] : [400, 400]
+  const limits = SIZE_LIMITS[folder]
   const blob = await shrinkImage(file, limits[0], limits[1])
   const type = blob.type || file.type
   const ext = type === 'image/webp' ? 'webp' : type === 'image/png' ? 'png' : 'jpg'

@@ -1,13 +1,15 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import {
   Bold,
   Heading2,
   Heading3,
+  ImagePlus,
   Italic,
   List,
   ListOrdered,
+  Loader2,
   Minus,
   Quote,
   Redo2,
@@ -16,8 +18,13 @@ import {
   Undo2,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import { useAuth } from '@/features/auth/hooks'
+import { getErrorMessage } from '@/lib/errors'
+import { ALLOWED_IMAGE_TYPES, uploadImage } from '@/lib/media'
 import { cn } from '@/lib/utils'
 import type { Json } from '@/types/database'
+import { ChapterImageNode } from './ImageNode'
 
 type ChapterEditorProps = {
   content: Json
@@ -36,6 +43,7 @@ export function ChapterEditor({ content, editable, onChange }: ChapterEditorProp
         code: false,
         link: { openOnClick: false, autolink: true, protocols: ['http', 'https', 'mailto'] },
       }),
+      ChapterImageNode,
     ],
     content: content as object,
     editable,
@@ -51,7 +59,9 @@ export function ChapterEditor({ content, editable, onChange }: ChapterEditorProp
   })
 
   useEffect(() => {
-    editor?.setEditable(editable)
+    // Без emitUpdate: иначе Tiptap сообщает об «изменении» и запускает автосохранение
+    // при каждом открытии главы.
+    editor?.setEditable(editable, false)
   }, [editor, editable])
 
   return (
@@ -65,6 +75,23 @@ export function ChapterEditor({ content, editable, onChange }: ChapterEditorProp
 }
 
 function Toolbar({ editor }: { editor: Editor }) {
+  const { userId } = useAuth()
+  const [fileInput, setFileInput] = useState<HTMLInputElement | null>(null)
+  const [uploading, setUploading] = useState(false)
+
+  async function insertImage(file: File) {
+    if (!userId) return
+    setUploading(true)
+    try {
+      const path = await uploadImage(file, 'chapters', userId)
+      editor.chain().focus().insertContent({ type: 'image', attrs: { path } }).run()
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Не удалось загрузить изображение'))
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const state = useEditorState({
     editor,
     selector: ({ editor: e }) => ({
@@ -126,6 +153,12 @@ function Toolbar({ editor }: { editor: Editor }) {
         run: () => editor.chain().focus().toggleOrderedList().run(),
       },
       { icon: Minus, label: 'Разделитель сцены', run: () => editor.chain().focus().setHorizontalRule().run() },
+      {
+        icon: uploading ? Loader2 : ImagePlus,
+        label: 'Вставить изображение',
+        disabled: uploading || !userId,
+        run: () => fileInput?.click(),
+      },
     ],
     [
       { icon: Undo2, label: 'Отменить', disabled: !state.canUndo, run: () => editor.chain().focus().undo().run() },
@@ -139,6 +172,19 @@ function Toolbar({ editor }: { editor: Editor }) {
       aria-label="Форматирование"
       className="sticky top-16 z-10 flex flex-wrap items-center gap-1 border-b border-white/5 bg-card/95 px-2 py-1.5 backdrop-blur"
     >
+      <input
+        ref={setFileInput}
+        type="file"
+        accept={ALLOWED_IMAGE_TYPES.join(',')}
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) void insertImage(file)
+          e.target.value = ''
+        }}
+      />
       {groups.map((group, gi) => (
         <div key={gi} className={cn('flex items-center gap-0.5', gi > 0 && 'border-l border-white/10 pl-1')}>
           {group.map(({ icon: Icon, label, active, disabled, run }) => (
@@ -155,7 +201,7 @@ function Toolbar({ editor }: { editor: Editor }) {
                 active ? 'bg-primary/25 text-foreground' : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
               )}
             >
-              <Icon className="size-4" aria-hidden />
+              <Icon className={cn('size-4', Icon === Loader2 && 'animate-spin')} aria-hidden />
             </button>
           ))}
         </div>

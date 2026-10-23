@@ -1,12 +1,14 @@
 import { Fragment, type ReactNode } from 'react'
 import type { Json } from '@/types/database'
-import { asNode, childNodes, safeHref, type DocMark, type DocNode } from './rich-text-utils'
+import { ChapterImage } from './ChapterImage'
+import { asNode, childNodes, safeHref, safeImagePath, type DocMark, type DocNode } from './rich-text-utils'
 
 // Безопасный вывод текста главы.
 // Текст хранится как JSON-документ Tiptap и превращается в React-элементы
 // по белому списку узлов и меток. dangerouslySetInnerHTML не используется:
 // любые «теги» внутри текста выводятся как обычный текст, неизвестные узлы
-// и атрибуты отбрасываются, ссылки разрешены только http(s) и mailto.
+// и атрибуты отбрасываются, ссылки разрешены только http(s) и mailto,
+// изображения — только загруженные на сайт (см. safeImagePath).
 
 function applyMarks(text: string, marks: unknown, key: string): ReactNode {
   let result: ReactNode = text
@@ -93,6 +95,11 @@ function renderNode(node: DocNode, key: string): ReactNode {
       return <hr key={key} />
     case 'hardBreak':
       return <br key={key} />
+    case 'image': {
+      const path = safeImagePath(node.attrs?.path)
+      const alt = typeof node.attrs?.alt === 'string' ? node.attrs.alt : undefined
+      return path ? <ChapterImage key={key} path={path} alt={alt} /> : null
+    }
     default:
       // Неизвестный узел (в том числе doc): показываем только вложенный текст.
       return <Fragment key={key}>{inner()}</Fragment>

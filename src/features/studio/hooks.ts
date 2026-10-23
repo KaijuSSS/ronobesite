@@ -1,12 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/hooks'
-import { fetchChapterEditor, fetchMyBooks, fetchMySubmissions, fetchStudioBook, fetchStudioChapters } from './api'
+import {
+  fetchChapterEditor,
+  fetchChapterStats,
+  fetchMyBooks,
+  fetchMySubmissions,
+  fetchStudioBook,
+  fetchStudioChapters,
+} from './api'
 
 export const studioKeys = {
   all: ['studio'] as const,
   books: (userId: string) => ['studio', 'books', userId] as const,
   book: (bookId: string) => ['studio', 'book', bookId] as const,
   chapters: (bookId: string) => ['studio', 'chapters', bookId] as const,
+  chapterStats: (bookId: string) => ['studio', 'chapter-stats', bookId] as const,
   chapter: (chapterId: string) => ['studio', 'chapter', chapterId] as const,
   submissions: (userId: string) => ['studio', 'submissions', userId] as const,
 }
@@ -32,6 +40,14 @@ export function useStudioChapters(bookId: string | undefined) {
   return useQuery({
     queryKey: studioKeys.chapters(bookId ?? ''),
     queryFn: () => fetchStudioChapters(bookId as string),
+    enabled: Boolean(bookId),
+  })
+}
+
+export function useChapterStats(bookId: string | undefined) {
+  return useQuery({
+    queryKey: studioKeys.chapterStats(bookId ?? ''),
+    queryFn: () => fetchChapterStats(bookId as string),
     enabled: Boolean(bookId),
   })
 }

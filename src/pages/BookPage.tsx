@@ -38,6 +38,7 @@ import type { BookDetail } from '@/features/books/api'
 import { useBook } from '@/features/books/hooks'
 import { usePublishedChapters } from '@/features/chapters/hooks'
 import { useBookProgress, useLibraryEntry, useLibraryMutations } from '@/features/library/hooks'
+import { FollowButton } from '@/features/profile/FollowButton'
 import { getLocalProgress } from '@/features/reader/local-progress'
 import { CommentsSection } from '@/features/social/CommentsSection'
 import { ReportDialog } from '@/features/social/ReportDialog'
@@ -125,13 +126,16 @@ function BookView({ book }: { book: BookDetail }) {
                   {book.title}
                 </h1>
                 {book.author ? (
-                  <Link
-                    to={`/profile/${book.author.username}`}
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    <UserAvatar profile={book.author} className="size-6" />
-                    {displayName(book.author)}
-                  </Link>
+                  <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-start">
+                    <Link
+                      to={`/profile/${book.author.username}`}
+                      className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <UserAvatar profile={book.author} className="size-6" />
+                      {displayName(book.author)}
+                    </Link>
+                    <FollowButton authorId={book.author.id} size="sm" />
+                  </div>
                 ) : null}
               </div>
 
@@ -238,7 +242,7 @@ function BookView({ book }: { book: BookDetail }) {
               Отзывы{' '}
               <span className="text-muted-foreground">{book.rating_count ? formatRating(book.rating_avg, book.rating_count) : ''}</span>
             </TabsTrigger>
-            <TabsTrigger value="comments">Комментарии</TabsTrigger>
+            <TabsTrigger value="comments">Обсуждение</TabsTrigger>
           </TabsList>
 
           <TabsContent value="chapters">
@@ -277,7 +281,10 @@ function BookView({ book }: { book: BookDetail }) {
           </TabsContent>
 
           <TabsContent value="comments" className="max-w-3xl">
-            <CommentsSection scope={{ bookId: book.id, chapterId: null }} />
+            <p className="mb-4 text-sm text-muted-foreground">
+              Здесь обсуждают произведение целиком. Комментарии к отдельной главе — в конце каждой главы.
+            </p>
+            <CommentsSection scope={{ bookId: book.id, chapterId: null }} title="Обсуждение произведения" />
           </TabsContent>
         </Tabs>
       </PageContainer>

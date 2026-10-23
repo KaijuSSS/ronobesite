@@ -4,9 +4,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   ArrowLeft,
+  Eye,
   ExternalLink,
   FilePlus2,
   FileQuestion,
+  Heart,
   Loader2,
   PencilLine,
   Send,
@@ -50,11 +52,11 @@ import {
   type StudioBookDetail,
 } from '@/features/studio/api'
 import { BookForm } from '@/features/studio/BookForm'
-import { studioKeys, useStudioBook, useStudioChapters } from '@/features/studio/hooks'
+import { studioKeys, useChapterStats, useStudioBook, useStudioChapters } from '@/features/studio/hooks'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { getErrorMessage } from '@/lib/errors'
 import { formatChapterNumber, formatCount, formatRelative } from '@/lib/format'
-import { WORD_FORMS, WORK_STATUS_LABELS, WORK_STATUSES } from '@/lib/labels'
+import { LIKE_FORMS, READ_FORMS, WORD_FORMS, WORK_STATUS_LABELS, WORK_STATUSES } from '@/lib/labels'
 import type { WorkStatus } from '@/types/database'
 
 export default function StudioBookPage() {
@@ -429,6 +431,7 @@ function PublishedBookInfo({
 
 function ChaptersSection({ bookId, disabled }: { bookId: string; disabled: boolean }) {
   const chapters = useStudioChapters(bookId)
+  const stats = useChapterStats(bookId)
   const nextNumber = chapters.data?.length ? Math.floor(Math.max(...chapters.data.map((c) => Number(c.number)))) + 1 : 1
 
   return (
@@ -455,6 +458,7 @@ function ChaptersSection({ bookId, disabled }: { bookId: string; disabled: boole
           {chapters.data.map((chapter) => {
             const open = chapter.openRevision
             const title = open?.title || chapter.published_title || 'Без названия'
+            const chapterStats = chapter.published_revision_id ? stats.data?.get(chapter.id) : undefined
             return (
               <li key={chapter.id}>
                 <Link
@@ -470,6 +474,16 @@ function ChaptersSection({ bookId, disabled }: { bookId: string; disabled: boole
                       {formatCount(open?.word_count ?? chapter.word_count, WORD_FORMS)} · изменено{' '}
                       {formatRelative(open?.updated_at ?? chapter.updated_at)}
                     </p>
+                    {chapterStats ? (
+                      <p className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1" title="Сколько читателей дочитали главу">
+                          <Eye className="size-3.5" aria-hidden /> {formatCount(chapterStats.reads, READ_FORMS)}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Heart className="size-3.5" aria-hidden /> {formatCount(chapterStats.likes, LIKE_FORMS)}
+                        </span>
+                      </p>
+                    ) : null}
                     {open?.state === 'rejected' && open.rejection_reason ? (
                       <p className="mt-1 line-clamp-2 text-xs text-red-300">Причина: {open.rejection_reason}</p>
                     ) : null}

@@ -81,3 +81,6 @@ export const CHAPTER_FORMS: [string, string, string] = ['глава', 'глав�
 export const RATING_FORMS: [string, string, string] = ['оценка', 'оценки', 'оценок']
 export const READER_FORMS: [string, string, string] = ['читатель', 'читателя', 'читателей']
 export const WORD_FORMS: [string, string, string] = ['слово', 'слова', 'слов']
+export const FOLLOWER_FORMS: [string, string, string] = ['подписчик', 'подписчика', 'подписчиков']
+export const READ_FORMS: [string, string, string] = ['прочтение', 'прочтения', 'прочтений']
+export const LIKE_FORMS: [string, string, string] = ['лайк', 'лайка', 'лайков']
