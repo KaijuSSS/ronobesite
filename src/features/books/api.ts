@@ -38,7 +38,10 @@ export type BookListResult = {
   totalPages: number
 }
 
-const BOOK_SELECT = '*, author:profiles(id, username, display_name, avatar_path), genres(id, slug, name)'
+// Связь указана явно: books и profiles связаны ещё через library_entries
+// и reading_progress, и без подсказки PostgREST отвечает ошибкой PGRST201.
+const BOOK_SELECT =
+  '*, author:profiles!books_author_id_fkey(id, username, display_name, avatar_path), genres(id, slug, name)'
 
 type BookWithRelations = BookRow & { author: AuthorInfo | null; genres: GenreInfo[] }
 
