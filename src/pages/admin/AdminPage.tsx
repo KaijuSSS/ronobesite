@@ -21,6 +21,7 @@ import {
   fetchInvites,
   fetchUsers,
   inviteState,
+  MAX_INVITE_USES,
   revokeInvite,
   updateSettings,
   type InviteState,
@@ -102,7 +103,7 @@ function InvitesTab() {
       createInvite({
         email: form.email,
         role: form.role,
-        maxUses: Math.min(100, Math.max(1, Number.parseInt(form.maxUses, 10) || 1)),
+        maxUses: Math.min(MAX_INVITE_USES, Math.max(1, Number.parseInt(form.maxUses, 10) || 1)),
         expiresInDays: form.days === 'never' ? null : Number(form.days),
         note: form.note,
       }),
@@ -160,7 +161,7 @@ function InvitesTab() {
                   {...props}
                   type="number"
                   min={1}
-                  max={100}
+                  max={MAX_INVITE_USES}
                   value={form.maxUses}
                   onChange={(e) => setForm({ ...form, maxUses: e.target.value })}
                 />

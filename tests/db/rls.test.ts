@@ -213,6 +213,16 @@ describe('роли и защищённые поля', () => {
     expect(invite.code).toMatch(/^[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/)
   })
 
+  it('приглашение рассчитано максимум на 10 000 человек', async () => {
+    const big = await db.one<{ max_uses: number }>(user(adminId), `select (public.create_invite(null, 'reader', 5000)).max_uses`)
+    expect(big.max_uses).toBe(5000)
+    const clamped = await db.one<{ max_uses: number }>(user(adminId), `select (public.create_invite(null, 'reader', 50000)).max_uses`)
+    expect(clamped.max_uses).toBe(10000)
+    await expect(
+      db.query(superuser, `insert into public.invites (code, max_uses) values ('TOO-MANY-1', 10001)`),
+    ).rejects.toThrow(/invites_max_uses_check/)
+  })
+
   it('e-mail пользователей не доступен через публичные таблицы', async () => {
     const cols = await db.query<{ column_name: string }>(
       superuser,

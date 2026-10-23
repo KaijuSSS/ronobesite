@@ -6,6 +6,9 @@ export async function fetchInvites(): Promise<InviteRow[]> {
   return unwrapList(await getSupabase().from('invites').select('*').order('created_at', { ascending: false }).limit(200))
 }
 
+/** Сколько человек может зарегистрироваться по одному приглашению (как в базе). */
+export const MAX_INVITE_USES = 10_000
+
 export type CreateInviteInput = {
   email: string
   role: AppRole
