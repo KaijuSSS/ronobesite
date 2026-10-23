@@ -310,56 +310,65 @@ function UsersTab() {
   if (users.isPending) return <Skeleton className="h-64 rounded-2xl" />
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-white/5 bg-card">
-      <table className="w-full min-w-[640px] text-sm">
-        <caption className="sr-only">Участники сайта</caption>
-        <thead>
-          <tr className="border-b border-white/5 text-left text-xs text-muted-foreground">
-            <th scope="col" className="px-4 py-3 font-medium">
-              Участник
-            </th>
-            <th scope="col" className="px-4 py-3 font-medium">
-              Регистрация
-            </th>
-            <th scope="col" className="px-4 py-3 font-medium">
-              Модератор
-            </th>
-            <th scope="col" className="px-4 py-3 font-medium">
-              Администратор
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.data.map((user) => (
-            <tr key={user.id} className="border-b border-white/5 last:border-0">
-              <td className="px-4 py-3">
-                <Link to={`/profile/${user.username}`} className="font-medium hover:text-primary">
-                  {displayName(user)}
-                </Link>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
-              </td>
-              <td className="px-4 py-3 text-xs text-muted-foreground">
-                {formatDate(user.created_at)}
-                {user.last_sign_in_at ? <span className="block">вход {formatRelative(user.last_sign_in_at)}</span> : null}
-              </td>
-              {(['moderator', 'admin'] as const).map((role) => {
-                const has = user.roles.includes(role)
-                const self = user.id === userId && role === 'admin'
-                return (
-                  <td key={role} className="px-4 py-3">
-                    <Switch
-                      checked={has}
-                      disabled={toggle.isPending || self}
-                      aria-label={`${ROLE_LABELS[role]}: ${displayName(user)}`}
-                      onCheckedChange={(enabled) => toggle.mutate({ id: user.id, role, enabled })}
-                    />
-                  </td>
-                )
-              })}
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        «Автор» может создавать произведения и главы. Модераторы и администраторы могут это всегда, остальные участники
+        только читают, оценивают и комментируют.
+      </p>
+      <div className="overflow-x-auto rounded-2xl border border-white/5 bg-card">
+        <table className="w-full min-w-[720px] text-sm">
+          <caption className="sr-only">Участники сайта</caption>
+          <thead>
+            <tr className="border-b border-white/5 text-left text-xs text-muted-foreground">
+              <th scope="col" className="px-4 py-3 font-medium">
+                Участник
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                Регистрация
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                Автор
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                Модератор
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                Администратор
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.data.map((user) => (
+              <tr key={user.id} className="border-b border-white/5 last:border-0">
+                <td className="px-4 py-3">
+                  <Link to={`/profile/${user.username}`} className="font-medium hover:text-primary">
+                    {displayName(user)}
+                  </Link>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">
+                  {formatDate(user.created_at)}
+                  {user.last_sign_in_at ? <span className="block">вход {formatRelative(user.last_sign_in_at)}</span> : null}
+                </td>
+                {(['author', 'moderator', 'admin'] as const).map((role) => {
+                  const has = user.roles.includes(role)
+                  const self = user.id === userId && role === 'admin'
+                  return (
+                    <td key={role} className="px-4 py-3">
+                      <Switch
+                        checked={has}
+                        disabled={toggle.isPending || self}
+                        aria-label={`${ROLE_LABELS[role]}: ${displayName(user)}`}
+                        onCheckedChange={(enabled) => toggle.mutate({ id: user.id, role, enabled })}
+                      />
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

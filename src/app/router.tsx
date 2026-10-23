@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { RouteErrorBoundary } from '@/components/common/RouteErrorBoundary'
 import { AuthLayout } from '@/features/auth/AuthLayout'
 import { RedirectIfAuthenticated, RequireAuth, RequireMember, RequireRole } from '@/features/auth/guards'
+import { WRITER_ROLES } from '@/features/auth/hooks'
 import HomePage from '@/pages/HomePage'
 import LoginPage from '@/pages/auth/LoginPage'
 import NotFoundPage from '@/pages/NotFoundPage'
@@ -37,6 +38,14 @@ function guarded(Guard: Guard, Page: ComponentType) {
   )
 }
 
+const writer: Guard = ({ children }) => (
+  <RequireRole
+    roles={WRITER_ROLES}
+    description="Публиковать произведения могут только авторы. Попросите администратора выдать вам роль «Автор»."
+  >
+    {children}
+  </RequireRole>
+)
 const staff: Guard = ({ children }) => <RequireRole roles={['moderator', 'admin']}>{children}</RequireRole>
 const admin: Guard = ({ children }) => <RequireRole roles={['admin']}>{children}</RequireRole>
 const guest: Guard = ({ children }) => <RedirectIfAuthenticated>{children}</RedirectIfAuthenticated>
@@ -54,10 +63,10 @@ export const routes: RouteObject[] = [
       { path: 'library', element: guarded(RequireAuth, LibraryPage) },
       { path: 'notifications', element: guarded(RequireAuth, NotificationsPage) },
       { path: 'settings', element: guarded(RequireAuth, SettingsPage) },
-      { path: 'studio', element: guarded(RequireAuth, StudioPage) },
-      { path: 'studio/new', element: guarded(RequireAuth, StudioNewBookPage) },
-      { path: 'studio/books/:bookId', element: guarded(RequireAuth, StudioBookPage) },
-      { path: 'studio/books/:bookId/chapters/:chapterId', element: guarded(RequireAuth, ChapterEditorPage) },
+      { path: 'studio', element: guarded(writer, StudioPage) },
+      { path: 'studio/new', element: guarded(writer, StudioNewBookPage) },
+      { path: 'studio/books/:bookId', element: guarded(writer, StudioBookPage) },
+      { path: 'studio/books/:bookId/chapters/:chapterId', element: guarded(writer, ChapterEditorPage) },
       { path: 'moderation', element: guarded(staff, ModerationPage) },
       { path: 'moderation/:queueId', element: guarded(staff, ModerationItemPage) },
       { path: 'admin', element: guarded(admin, AdminPage) },

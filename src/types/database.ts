@@ -6,7 +6,7 @@
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
-export type AppRole = 'reader' | 'moderator' | 'admin'
+export type AppRole = 'reader' | 'author' | 'moderator' | 'admin'
 export type WorkStatus = 'ongoing' | 'completed' | 'hiatus' | 'abandoned'
 export type PublicationState = 'draft' | 'pending' | 'published' | 'rejected' | 'hidden'
 export type RevisionState = 'draft' | 'pending' | 'approved' | 'rejected' | 'superseded'

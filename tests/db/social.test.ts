@@ -36,8 +36,9 @@ beforeAll(async () => {
   db = await TestDb.create()
   await db.createInvite('BOOT-ADMIN', 'admin')
   await db.createInvite('TEAM-0001', 'reader', 5)
+  await db.createInvite('AUTH-0001', 'author')
   adminId = await db.signUp('admin@example.com', 'admin_user', 'BOOT-ADMIN')
-  authorId = await db.signUp('author@example.com', 'author', 'TEAM-0001')
+  authorId = await db.signUp('author@example.com', 'author', 'AUTH-0001')
   readerId = await db.signUp('reader@example.com', 'reader', 'TEAM-0001')
 
   const genre = await db.one<{ id: string }>(superuser, `select id from public.genres order by sort_order limit 1`)

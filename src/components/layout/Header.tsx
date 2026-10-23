@@ -17,7 +17,7 @@ function navClass({ isActive }: { isActive: boolean }) {
 }
 
 export function Header() {
-  const { isAuthenticated, isStaff, isLoading } = useAuth()
+  const { isAuthenticated, isStaff, canWrite, isLoading } = useAuth()
   const { canRead } = useCatalogAccess()
   const [mobileSearch, setMobileSearch] = useState(false)
 
@@ -42,9 +42,11 @@ export function Header() {
               <NavLink to="/library" className={navClass}>
                 Библиотека
               </NavLink>
-              <NavLink to="/studio" className={navClass}>
-                Студия
-              </NavLink>
+              {canWrite ? (
+                <NavLink to="/studio" className={navClass}>
+                  Студия
+                </NavLink>
+              ) : null}
             </>
           ) : null}
           {isStaff ? (

@@ -65,7 +65,7 @@ function GuestLanding() {
 }
 
 function MemberHome() {
-  const { profile, isAuthenticated } = useAuth()
+  const { profile, isAuthenticated, canWrite } = useAuth()
   const popular = useBookList({ sort: 'popular', pageSize: 12 })
   const updated = useBookList({ sort: 'updated', pageSize: 12 })
   const fresh = useBookList({ sort: 'new', pageSize: 12 })
@@ -96,13 +96,19 @@ function MemberHome() {
           <EmptyState
             icon={BookOpen}
             title="Каталог пока пуст"
-            description="Здесь появятся произведения, как только авторы опубликуют их и модератор одобрит. Станьте первым!"
+            description={
+              canWrite
+                ? 'Здесь появятся произведения, как только авторы опубликуют их и модератор одобрит. Станьте первым!'
+                : 'Здесь появятся произведения, как только авторы опубликуют их и модератор одобрит.'
+            }
             action={
-              <Button asChild className="bg-brand-gradient border-0">
-                <Link to="/studio/new">
-                  <PenSquare /> Создать произведение
-                </Link>
-              </Button>
+              canWrite ? (
+                <Button asChild className="bg-brand-gradient border-0">
+                  <Link to="/studio/new">
+                    <PenSquare /> Создать произведение
+                  </Link>
+                </Button>
+              ) : null
             }
           />
         ) : (

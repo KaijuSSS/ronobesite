@@ -33,7 +33,15 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 }
 
 /** Только для указанных ролей. Права всё равно проверяются базой данных. */
-export function RequireRole({ roles, children }: { roles: AppRole[]; children: ReactNode }) {
+export function RequireRole({
+  roles,
+  description = 'Этот раздел доступен только модераторам и администраторам.',
+  children,
+}: {
+  roles: AppRole[]
+  description?: string
+  children: ReactNode
+}) {
   const auth = useAuth()
   const loginUrl = useLoginRedirect()
   if (auth.isLoading) return <PageLoader />
@@ -43,7 +51,7 @@ export function RequireRole({ roles, children }: { roles: AppRole[]; children: R
       <EmptyState
         icon={ShieldAlert}
         title="Недостаточно прав"
-        description="Этот раздел доступен только модераторам и администраторам."
+        description={description}
         action={
           <Button asChild variant="secondary">
             <Link to="/">На главную</Link>

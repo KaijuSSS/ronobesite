@@ -1,6 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
+import type { AppRole } from '@/types/database'
 import { useAuthStore } from './store'
 import { fetchCurrentUser, fetchPublicConfig } from './api'
+
+/** Роли, которым доступна Студия (совпадает с public.can_write() в базе). */
+export const WRITER_ROLES: AppRole[] = ['author', 'moderator', 'admin']
 
 export const authKeys = {
   config: ['public-config'] as const,
@@ -38,6 +42,8 @@ export function useAuth() {
     isAuthenticated: Boolean(session),
     isAdmin: roles.includes('admin'),
     isStaff: roles.includes('admin') || roles.includes('moderator'),
+    /** Может создавать произведения и главы (роли «Автор», модератор, администратор). */
+    canWrite: WRITER_ROLES.some((role) => roles.includes(role)),
     /** Пока true — неизвестно, вошёл ли пользователь и какие у него роли. */
     isLoading: initializing || (Boolean(userId) && me.isPending),
     error: me.error,

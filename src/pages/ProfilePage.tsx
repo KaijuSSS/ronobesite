@@ -19,7 +19,7 @@ import { ROLE_LABELS } from '@/lib/labels'
 
 export default function ProfilePage() {
   const { username = '' } = useParams()
-  const { userId } = useAuth()
+  const { userId, canWrite } = useAuth()
   const profile = useQuery({
     queryKey: ['profile', username],
     queryFn: () => fetchProfileByUsername(username),
@@ -123,7 +123,7 @@ export default function ProfilePage() {
             title="Пока нет опубликованных произведений"
             compact
             action={
-              isOwn ? (
+              isOwn && canWrite ? (
                 <Button asChild>
                   <Link to="/studio/new">Создать произведение</Link>
                 </Button>

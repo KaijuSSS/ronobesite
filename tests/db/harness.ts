@@ -66,7 +66,7 @@ export class TestDb {
     return row.id
   }
 
-  async createInvite(code: string, role: 'reader' | 'moderator' | 'admin' = 'reader', maxUses = 1): Promise<void> {
+  async createInvite(code: string, role: 'reader' | 'author' | 'moderator' | 'admin' = 'reader', maxUses = 1): Promise<void> {
     await this.query(superuser, `insert into public.invites (code, role, max_uses) values ($1, $2, $3)`, [
       code,
       role,

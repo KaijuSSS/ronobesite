@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router'
-import { BookMarked, Compass, Home, PenSquare, ShieldCheck, User } from 'lucide-react'
+import { Bell, BookMarked, Compass, Home, PenSquare, ShieldCheck, User } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAuth } from '@/features/auth/hooks'
 import { cn } from '@/lib/utils'
@@ -8,7 +8,7 @@ type Item = { to: string; label: string; icon: LucideIcon; end?: boolean }
 
 /** Нижняя панель навигации на телефонах. */
 export function MobileNav() {
-  const { isAuthenticated, isStaff, profile } = useAuth()
+  const { isAuthenticated, isStaff, canWrite, profile } = useAuth()
   if (!isAuthenticated) return null
 
   const items: Item[] = [
@@ -17,7 +17,9 @@ export function MobileNav() {
     { to: '/library', label: 'Библиотека', icon: BookMarked },
     isStaff
       ? { to: '/moderation', label: 'Проверка', icon: ShieldCheck }
-      : { to: '/studio', label: 'Студия', icon: PenSquare },
+      : canWrite
+        ? { to: '/studio', label: 'Студия', icon: PenSquare }
+        : { to: '/notifications', label: 'Уведомления', icon: Bell },
     { to: profile ? `/profile/${profile.username}` : '/settings', label: 'Профиль', icon: User },
   ]
 

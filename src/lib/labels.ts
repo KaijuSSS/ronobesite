@@ -59,6 +59,7 @@ export const MODERATION_STATUS_LABELS: Record<ModerationStatus, string> = {
 
 export const ROLE_LABELS: Record<AppRole, string> = {
   reader: 'Читатель',
+  author: 'Автор',
   moderator: 'Модератор',
   admin: 'Администратор',
 }

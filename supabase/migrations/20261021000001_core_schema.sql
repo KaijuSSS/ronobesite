@@ -9,7 +9,9 @@
 -- ---------------------------------------------------------------------
 -- Перечисления
 -- ---------------------------------------------------------------------
-create type public.app_role as enum ('reader', 'moderator', 'admin');
+-- 'author' добавлен позже (миграция 20261024000007); здесь он есть сразу,
+-- чтобы setup.sql для нового проекта выполнялся одним запуском.
+create type public.app_role as enum ('reader', 'author', 'moderator', 'admin');
 create type public.work_status as enum ('ongoing', 'completed', 'hiatus', 'abandoned');
 create type public.publication_state as enum ('draft', 'pending', 'published', 'rejected', 'hidden');
 create type public.revision_state as enum ('draft', 'pending', 'approved', 'rejected', 'superseded');

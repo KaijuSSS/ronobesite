@@ -16,7 +16,7 @@ import { displayName } from '@/lib/format'
 import { UserAvatar } from './UserAvatar'
 
 export function UserMenu() {
-  const { profile, isStaff, isAdmin, user } = useAuth()
+  const { profile, isStaff, isAdmin, canWrite, user } = useAuth()
   const navigate = useNavigate()
 
   async function handleSignOut() {
@@ -54,11 +54,13 @@ export function UserMenu() {
             <BookMarked /> Библиотека
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/studio">
-            <PenSquare /> Студия автора
-          </Link>
-        </DropdownMenuItem>
+        {canWrite ? (
+          <DropdownMenuItem asChild>
+            <Link to="/studio">
+              <PenSquare /> Студия автора
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
         {isStaff ? (
           <DropdownMenuItem asChild>
             <Link to="/moderation">

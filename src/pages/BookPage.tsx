@@ -86,7 +86,7 @@ export default function BookPage() {
 }
 
 function BookView({ book }: { book: BookDetail }) {
-  const { isAuthenticated, userId } = useAuth()
+  const { isAuthenticated, userId, canWrite } = useAuth()
   const chapters = usePublishedChapters(book.id)
   const progress = useBookProgress(book.id)
   const [expanded, setExpanded] = useState(false)
@@ -177,11 +177,13 @@ function BookView({ book }: { book: BookDetail }) {
                 )}
                 {isAuthenticated ? <LibraryButton bookId={book.id} /> : null}
                 {isAuthor ? (
-                  <Button asChild size="lg" variant="ghost">
-                    <Link to={`/studio/books/${book.id}`}>
-                      <PenSquare /> Редактировать
-                    </Link>
-                  </Button>
+                  canWrite ? (
+                    <Button asChild size="lg" variant="ghost">
+                      <Link to={`/studio/books/${book.id}`}>
+                        <PenSquare /> Редактировать
+                      </Link>
+                    </Button>
+                  ) : null
                 ) : isAuthenticated ? (
                   <ReportDialog
                     targetType="book"

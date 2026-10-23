@@ -57,9 +57,10 @@ beforeAll(async () => {
   await db.createInvite('BOOT-ADMIN', 'admin')
   await db.createInvite('MODS-0001', 'moderator')
   await db.createInvite('TEAM-0001', 'reader', 5)
+  await db.createInvite('AUTH-0001', 'author')
   adminId = await db.signUp('admin@example.com', 'admin_user', 'boot-admin')
   moderatorId = await db.signUp('mod@example.com', 'moderator', 'MODS-0001')
-  authorId = await db.signUp('author@example.com', 'author', 'TEAM-0001')
+  authorId = await db.signUp('author@example.com', 'author', 'AUTH-0001')
   readerId = await db.signUp('reader@example.com', 'reader', 'TEAM-0001')
   const genres = await db.query<{ id: string }>(superuser, `select id from public.genres order by sort_order`)
   genreIds = genres.map((g) => g.id)
@@ -149,6 +150,25 @@ describe('роли и защищённые поля', () => {
     await expect(
       db.query(user(authorId), `insert into public.books (title, publication_state) values ('x', 'published')`),
     ).rejects.toThrow(/permission denied/)
+  })
+
+  it('писать могут только авторы, модераторы и администраторы', async () => {
+    await expect(
+      db.query(user(readerId), `insert into public.books (title, description) values ('Без роли', 'x')`),
+    ).rejects.toThrow(/row-level security/)
+
+    // Книга, созданная до лишения роли, остаётся, но работать с ней нельзя.
+    const owner = await db.signUp('former@example.com', 'former_author', 'TEAM-0001')
+    await db.query(user(adminId), `select public.set_user_role($1, 'author', true)`, [owner])
+    const book = await createDraftBook(owner, 'Бывший автор')
+    await db.query(user(adminId), `select public.set_user_role($1, 'author', false)`, [owner])
+    await expect(db.query(user(owner), `select public.create_chapter($1, 1, 'x')`, [book.id])).rejects.toThrow(
+      /только авторы/,
+    )
+    await expect(db.query(user(owner), `select public.submit_book($1)`, [book.id])).rejects.toThrow(/только авторы/)
+
+    const roles = await db.query<{ role: string }>(superuser, `select role from public.user_roles where user_id = $1`, [authorId])
+    expect(roles.map((r) => r.role)).toContain('author')
   })
 
   it('нельзя создать книгу от имени другого пользователя', async () => {
