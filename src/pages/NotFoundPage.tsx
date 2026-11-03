@@ -12,7 +12,7 @@ export default function NotFoundPage() {
       <EmptyState
         icon={Compass}
         title="Страница не найдена"
-        description="Похоже, такой страницы нет или ссылка устарела."
+        description="Такой страницы нет или ссылка устарела."
         action={
           <>
             <Button asChild>

@@ -65,7 +65,7 @@ export function CommentsSection({ scope, title = 'Комментарии' }: { s
             id={`comment-${scope.chapterId ?? scope.bookId}`}
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Поделитесь впечатлениями…"
+            placeholder="Ваш комментарий"
             maxLength={MAX_LENGTH}
             rows={3}
           />
@@ -102,7 +102,7 @@ export function CommentsSection({ scope, title = 'Комментарии' }: { s
           ))}
         </div>
       ) : comments.data.length === 0 ? (
-        <EmptyState icon={MessageSquare} title="Пока нет комментариев" description="Станьте первым!" compact />
+        <EmptyState icon={MessageSquare} title="Комментариев пока нет" compact />
       ) : (
         <ul className="space-y-5">
           {comments.data.map((comment) => {

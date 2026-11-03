@@ -260,7 +260,7 @@ function BookView({ book }: { book: BookDetail }) {
               <EmptyState
                 icon={ListOrdered}
                 title="Опубликованных глав пока нет"
-                description="Как только автор опубликует первую главу и её одобрит модератор, она появится здесь."
+                description="Главы появятся здесь после публикации и проверки модератором."
                 compact
               />
             ) : (

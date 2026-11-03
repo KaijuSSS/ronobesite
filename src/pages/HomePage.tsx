@@ -32,11 +32,10 @@ function GuestLanding() {
           <KeyRound className="size-3.5 text-primary" aria-hidden /> Доступ по приглашениям
         </span>
         <h1 className="font-display text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl">
-          Истории, которые <span className="text-brand-gradient">хочется дочитать</span>
+          Ранобэ, веб-новеллы <span className="text-brand-gradient">и рассказы</span>
         </h1>
         <p className="mt-5 max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">
-          RanobeSite — закрытая площадка для чтения и публикации ранобэ, веб-новелл и рассказов. Войдите, чтобы открыть
-          каталог, или зарегистрируйтесь по коду приглашения.
+          Каталог доступен участникам сайта. Войдите в аккаунт или зарегистрируйтесь по коду приглашения.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="bg-brand-gradient border-0 px-7">
@@ -48,9 +47,9 @@ function GuestLanding() {
         </div>
         <ul className="mt-14 grid w-full gap-3 text-left sm:grid-cols-3">
           {[
-            { icon: BookOpen, title: 'Удобная читалка', text: 'Темы, шрифты, ширина текста и сохранение места чтения.' },
-            { icon: PenSquare, title: 'Студия автора', text: 'Пишите главы в редакторе с автосохранением черновиков.' },
-            { icon: Library, title: 'Своя библиотека', text: 'Статусы «Читаю», «В планах», история и продолжение чтения.' },
+            { icon: BookOpen, title: 'Читалка', text: 'Темы, шрифты, ширина текста, сохранение места чтения.' },
+            { icon: PenSquare, title: 'Студия автора', text: 'Редактор глав с автосохранением и проверкой модератором.' },
+            { icon: Library, title: 'Библиотека', text: 'Статусы «Читаю» и «В планах», история чтения.' },
           ].map(({ icon: Icon, title, text }) => (
             <li key={title} className="rounded-2xl border border-white/5 bg-card/70 p-4 backdrop-blur">
               <Icon className="mb-3 size-5 text-primary" aria-hidden />
@@ -80,12 +79,25 @@ function MemberHome() {
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
           <p className="text-sm font-medium text-primary">
-            {isAuthenticated && profile ? `С возвращением, ${displayName(profile)}!` : 'Добро пожаловать!'}
+            {isAuthenticated && profile ? displayName(profile) : 'RanobeSite'}
           </p>
           <h1 className="mt-2 max-w-2xl font-display text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl">
-            Что почитаем сегодня?
+            Ранобэ, веб-новеллы и рассказы
           </h1>
           <SearchBox size="lg" className="mt-6 max-w-xl" />
+          {isAuthenticated ? null : (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Читать можно без регистрации. Комментарии, оценки и библиотека доступны после{' '}
+              <Link to="/login" className="font-medium text-primary hover:underline">
+                входа
+              </Link>
+              . Регистрация —{' '}
+              <Link to="/register" className="font-medium text-primary hover:underline">
+                по приглашению
+              </Link>
+              .
+            </p>
+          )}
         </div>
       </section>
 
@@ -96,11 +108,7 @@ function MemberHome() {
           <EmptyState
             icon={BookOpen}
             title="Каталог пока пуст"
-            description={
-              canWrite
-                ? 'Здесь появятся произведения, как только авторы опубликуют их и модератор одобрит. Станьте первым!'
-                : 'Здесь появятся произведения, как только авторы опубликуют их и модератор одобрит.'
-            }
+            description="Произведения появятся здесь после публикации и проверки модератором."
             action={
               canWrite ? (
                 <Button asChild className="bg-brand-gradient border-0">

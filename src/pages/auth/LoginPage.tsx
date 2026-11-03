@@ -49,7 +49,7 @@ export default function LoginPage() {
   return (
     <AuthCard
       title="Вход"
-      description={redirect ? 'Войдите, чтобы открыть эту страницу.' : 'С возвращением! Введите e-mail и пароль.'}
+      description={redirect ? 'Войдите, чтобы открыть эту страницу.' : 'Введите e-mail и пароль.'}
       footer={
         <>
           Нет аккаунта?{' '}

@@ -83,7 +83,7 @@ export function ReviewsSection({ bookId, bookSlug, authorId }: ReviewsSectionPro
           ))}
         </div>
       ) : reviews.data.length === 0 ? (
-        <EmptyState icon={Star} title="Пока нет отзывов" description="Расскажите, что думаете о книге." compact />
+        <EmptyState icon={Star} title="Отзывов пока нет" compact />
       ) : (
         <ul className="space-y-3">
           {reviews.data.map((review) => (
@@ -146,7 +146,7 @@ function ReviewForm({ bookId, initialRating, initialBody, isEdit, onSaved }: Rev
   const save = useMutation({
     mutationFn: () => saveReview(bookId, rating, body),
     onSuccess: () => {
-      toast.success(isEdit ? 'Отзыв обновлён' : 'Спасибо за оценку!')
+      toast.success(isEdit ? 'Отзыв обновлён' : 'Оценка сохранена')
       onSaved()
     },
     onError: (error) => toast.error(getErrorMessage(error)),
@@ -188,7 +188,7 @@ function ReviewForm({ bookId, initialRating, initialBody, isEdit, onSaved }: Rev
           onChange={(e) => setBody(e.target.value)}
           maxLength={5000}
           rows={3}
-          placeholder="Что понравилось, а что нет?"
+          placeholder="Текст отзыва (необязательно)"
         />
       </div>
       <div className="flex justify-end">

@@ -4,10 +4,10 @@ import type { BookListResult } from '@/features/books/api'
 import { renderWithProviders, setSignedIn, setSignedOut } from '@/test/utils'
 import HomePage from './HomePage'
 
-const me = vi.hoisted(() => ({ roles: ['reader'] as string[] }))
+const me = vi.hoisted(() => ({ roles: ['reader'] as string[], catalog: 'members' as 'members' | 'public' }))
 
 vi.mock('@/features/auth/api', () => ({
-  fetchPublicConfig: () => Promise.resolve({ registration_mode: 'invite', catalog_access: 'members' }),
+  fetchPublicConfig: () => Promise.resolve({ registration_mode: 'invite', catalog_access: me.catalog }),
   fetchCurrentUser: () =>
     Promise.resolve({ profile: { id: 'user-1', username: 'reader', display_name: 'Читатель' }, roles: me.roles }),
 }))
@@ -24,7 +24,17 @@ vi.mock('@/features/library/api', () => ({
 }))
 
 describe('главная страница', () => {
+  it('гостю открытого каталога показывает книги и подсказывает про вход', async () => {
+    me.catalog = 'public'
+    setSignedOut()
+    renderWithProviders(<HomePage />)
+    expect(await screen.findByText(/Читать можно без регистрации/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'по приглашению' })).toHaveAttribute('href', '/register')
+    me.catalog = 'members'
+  })
+
   it('гостю закрытого сайта показывает приглашение войти, а не каталог', async () => {
+    me.catalog = 'members'
     setSignedOut()
     renderWithProviders(<HomePage />)
     expect(await screen.findByRole('link', { name: 'Войти' })).toHaveAttribute('href', '/login')

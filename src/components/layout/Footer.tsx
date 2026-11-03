@@ -10,7 +10,7 @@ export function Footer() {
         <div className="max-w-sm space-y-3">
           <Logo />
           <p className="text-sm text-muted-foreground">
-            Закрытая площадка для чтения и публикации ранобэ, веб-новелл и рассказов. Все тексты проходят модерацию.
+            Чтение и публикация ранобэ, веб-новелл и рассказов. Публикации проходят проверку модераторами.
           </p>
         </div>
         {isAuthenticated ? (

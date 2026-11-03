@@ -129,7 +129,7 @@ function QueueTab({ counts }: { counts: Record<ModerationKind, number> | undefin
         <EmptyState
           icon={CheckCircle2}
           title={filter.status === 'pending' ? 'Очередь пуста' : 'Заявок не найдено'}
-          description={filter.status === 'pending' ? 'Все заявки обработаны. Отличная работа!' : undefined}
+          description={filter.status === 'pending' ? 'Новых заявок нет.' : undefined}
         />
       ) : (
         <ul className="space-y-2">
