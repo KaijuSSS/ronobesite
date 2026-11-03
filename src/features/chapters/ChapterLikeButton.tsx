@@ -29,7 +29,9 @@ export function ChapterLikeButton({ chapterId }: { chapterId: string }) {
         <Heart className={cn(liked && 'fill-current')} />
         {liked ? 'Вам нравится' : 'Нравится'}
       </Button>
-      <span className="text-xs text-[color:var(--muted-foreground)]">{formatCount(count, LIKE_FORMS)}</span>
+      <span className="text-xs text-[color:var(--muted-foreground)]">
+        {count === 0 ? 'Отметьте первым' : formatCount(count, LIKE_FORMS)}
+      </span>
     </div>
   )
 }
